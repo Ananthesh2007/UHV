@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UHV Unit 2 Quiz - Self and Body</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #e8ecf4;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Landing Page Styles */
+        .landing-card {
+            background: white;
+            border-radius: 16px;
+            padding: 48px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            text-align: center;
+            max-width: 600px;
+            margin: 40px auto;
+        }
+
+        .logo-circle {
+            width: 64px;
+            height: 64px;
+            background: #4f46e5;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+        }
+
+        .logo-circle svg {
+            width: 32px;
+            height: 32px;
+            color: white;
+        }
+
+        .landing-card h1 {
+            font-size: 28px;
+            color: #1f2937;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            color: #6b7280;
+            font-size: 16px;
+            margin-bottom: 32px;
+        }
+
+        .stats-grid {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .stat-box {
+            background: #f3f4f6;
+            padding: 20px 32px;
+            border-radius: 12px;
+            min-width: 100px;
+        }
+
+        .stat-box.purple { background: #ede9fe; }
+        .stat-box.green { background: #d1fae5; }
+        .stat-box.pink { background: #fce7f3; }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: 700;
+            color: #4f46e5;
+            display: block;
+        }
+
+        .stat-box.green .stat-number { color: #059669; }
+        .stat-box.pink .stat-number { color: #db2777; }
+
+        .stat-label {
+            font-size: 13px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        .info-box {
+            background: #fefce8;
+            border: 1px solid #fde047;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: left;
+            margin-bottom: 32px;
+        }
+
+        .info-box h3 {
+            color: #854d0e;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-box ul {
+            list-style: none;
+            color: #a16207;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .info-box li:before {
+            content: "•";
+            color: #eab308;
+            margin-right: 8px;
+        }
+
+        .mode-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .mode-btn {
+            width: 100%;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .mode-btn.primary {
+            background: #4f46e5;
+            color: white;
+        }
+
+        .mode-btn.primary:hover {
+            background: #4338ca;
+            transform: translateY(-1px);
+        }
+
+        .mode-btn.secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .mode-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        /* Quiz Container Styles */
+        .quiz-header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding: 0 8px;
+        }
+
+        .quiz-header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .question-badge {
+            background: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 14px;
+        }
+
+        .timer {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .score-display {
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .progress-line {
+            height: 4px;
+            background: #d1d5db;
+            border-radius: 2px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #4f46e5;
+            transition: width 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .quiz-container {
+            display: none;
+        }
+
+        .question-card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .question-text {
+            font-size: 20px;
+            color: #1f2937;
+            margin-bottom: 24px;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            text-align: left;
+            width: 100%;
+        }
+
+        .option:hover:not(.disabled) {
+            border-color: #4f46e5;
+            background: #f5f3ff;
+        }
+
+        .option-letter {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #6b7280;
+            flex-shrink: 0;
+            font-size: 14px;
+        }
+
+        .option-text {
+            color: #374151;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+
+        .option.correct {
+            border-color: #22c55e;
+            background: #f0fdf4;
+        }
+
+        .option.correct .option-letter {
+            background: #22c55e;
+            color: white;
+        }
+
+        .option.wrong {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .option.wrong .option-letter {
+            background: #ef4444;
+            color: white;
+        }
+
+        .option.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .quiz-controls {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-prev {
+            background: white;
+            color: #374151;
+            border: 1px solid #e5e7eb;
+        }
+
+        .btn-prev:hover:not(:disabled) {
+            background: #f9fafb;
+        }
+
+        .btn-prev:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-submit {
+            background: #4f46e5;
+            color: white;
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            background: #4338ca;
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .feedback {
+            padding: 16px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .feedback.correct {
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+
+        .feedback.wrong {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        /* Results Styles */
+        .results-container {
+            display: none;
+            text-align: center;
+            padding: 48px;
+        }
+
+        .results-card {
+            background: white;
+            border-radius: 16px;
+            padding: 48px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: #4f46e5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            color: white;
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .results-message {
+            color: #6b7280;
+            font-size: 16px;
+            margin-bottom: 32px;
+        }
+
+        .btn-restart {
+            background: #4f46e5;
+            color: white;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        @media (max-width: 640px) {
+            .landing-card {
+                padding: 32px 24px;
+                margin: 20px auto;
+            }
+            
+            .stats-grid {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .question-card {
+                padding: 24px;
+            }
+            
+            .question-text {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Landing Page -->
+        <div class="landing-card" id="landingPage">
+            <div class="logo-circle">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+            </div>
+            
+            <h1>UHV Unit 2 Quiz</h1>
+            <p class="subtitle">Test your knowledge with 55 multiple choice questions on Self and Body</p>
+            
+            <div class="stats-grid">
+                <div class="stat-box purple">
+                    <span class="stat-number">55</span>
+                    <div class="stat-label">Questions</div>
+                </div>
+                <div class="stat-box green">
+                    <span class="stat-number">4</span>
+                    <div class="stat-label">Options Each</div>
+                </div>
+                <div class="stat-box pink">
+                    <span class="stat-number">∞</span>
+                    <div class="stat-label">Attempts</div>
+                </div>
+            </div>
+            
+            <div class="info-box">
+                <h3>
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline; vertical-align: middle;">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    How it works:
+                </h3>
+                <ul>
+                    <li>Choose your preferred mode: PDF Order or Random Shuffle</li>
+                    <li>PDF Order: Questions appear as in the original document</li>
+                    <li>Random Mode: Questions and options are shuffled</li>
+                    <li>Select your answer and click Submit to check if you're correct</li>
+                    <li>Use Previous button to review your answers</li>
+                    <li>Your score will be shown at the end</li>
+                </ul>
+            </div>
+            
+            <div class="mode-buttons">
+                <button class="mode-btn primary" onclick="startQuiz('pdf')">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Start Quiz - PDF Order
+                </button>
+                <button class="mode-btn secondary" onclick="startQuiz('random')">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                    </svg>
+                    Start Quiz - Random Mode
+                </button>
+            </div>
+        </div>
+
+        <!-- Quiz Container -->
+        <div class="quiz-container" id="quizContainer">
+            <div class="quiz-header-bar">
+                <div class="quiz-header-left">
+                    <span class="question-badge" id="questionCounter">Q1/55</span>
+                    <span class="timer">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span id="timer">00:00</span>
+                    </span>
+                </div>
+                <span class="score-display" id="scoreDisplay">Score: 0/0</span>
+            </div>
+            
+            <div class="progress-line">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+
+            <div class="question-card">
+                <div class="question-text" id="questionText"></div>
+                
+                <div class="feedback" id="feedback"></div>
+                
+                <div class="options-container" id="optionsContainer"></div>
+                
+                <div class="quiz-controls">
+                    <button class="btn btn-prev" id="prevBtn" onclick="previousQuestion()" disabled>← Previous</button>
+                    <button class="btn btn-submit" id="submitBtn" onclick="submitAnswer()" disabled>Submit Answer</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Container -->
+        <div class="results-container" id="resultsContainer">
+            <div class="results-card">
+                <div class="score-circle" id="finalScore">0%</div>
+                <h2 style="color: #1f2937; margin-bottom: 12px;">Quiz Completed!</h2>
+                <p class="results-message" id="resultsMessage"></p>
+                <button class="btn-restart" onclick="resetQuiz()">← Back to Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // All 55 questions from UHV Unit 2 PDF
+        const originalQuestions = [
+            { q: "Employing the body physically for the production and maintenance of physical facilities is called as ---------------", options: ["Asan", "Pranayam", "Labour", "None of these"], correct: 2 },
+            { q: "Trust, Respect, Happiness, etc., are the needs of", options: ["The Body", "The Self (I)", "The Self and the Body", "None of these"], correct: 1 },
+            { q: "The activities of the body (in response) are", options: ["Assuming and Knowing", "Assuming and Fulfilling", "Recognising and Fulfilling", "Knowing and Fulfilling"], correct: 3 },
+            { q: "'Seer' means the one that", options: ["Does something", "understands", "Experience", "All of these"], correct: 1 },
+            { q: "Who is responsible for happiness and unhappiness?", options: ["Body", "Self", "Outside situations", "Society"], correct: 1 },
+            { q: "Human body is an instrument to facilitate", options: ["Sensations", "Preconditioning", "Right Understanding", "Assumptions"], correct: 2 },
+            { q: "When we assume something on the basis of prevailing notion, then it is called as", options: ["Preconditioning", "Sensation", "Right Understanding", "Natural Acceptance"], correct: 0 },
+            { q: "Behaviour on the basis of right understanding and realization is called", options: ["Confused behaviour", "Wrong behaviour", "Self organized behaviour", "All of these"], correct: 2 },
+            { q: "The activity of selecting/tasting is", options: ["Continuous", "Variable", "Uncertain", "None of these"], correct: 0 },
+            { q: "The power/force for the activity of analyzing is", options: ["Desire", "Expectations", "Realization", "Thoughts"], correct: 3 },
+            { q: "When there is harmony among the parts of the body, then it is called a status of", options: ["Sanyam", "Swasthya", "Both Sanyam and Swasthya", "None of these"], correct: 2 },
+            { q: "Harmony should be maintained between", options: ["Body and Life", "Self and Society", "Society and Environment", "All of these"], correct: 3 },
+            { q: "The statement \"all parts of the body performing their expected functions\" is related with", options: ["Proper upkeep", "Self regulation", "Sanyam", "Swasthya"], correct: 3 },
+            { q: "...........is the central to the human existence", options: ["Body", "Self", "Physical facilities", "None of these"], correct: 1 },
+            { q: "Realization is the activity of", options: ["Self", "Body", "Both Self and Body", "None of these"], correct: 0 },
+            { q: "\"Seeing the Self by the Self\" means", options: ["The conscious observation of the consciousness", "The conscious observation of the material", "The conscious observation of the co-existence", "None of these"], correct: 0 },
+            { q: "Activities of the body are", options: ["Temporary in Time", "Continuous in Time", "Discrete in nature", "None of these"], correct: 1 },
+            { q: "............is central to existence", options: ["Body", "Physical facility", "Co-existence", "Self"], correct: 3 },
+            { q: "Which of the following does not lead right understanding in the Self (I)", options: ["A process of do's don'ts, in which we assume what is being said without verification", "A process of self-verification on your own right", "Verification of the proposals on the basis of natural acceptance", "Verification through experiential validation"], correct: 0 },
+            { q: "Which one of the following is correct?", options: ["Self = Body", "Self and Body are in co-existence", "Needs of the Self and Body are same", "All are correct"], correct: 1 },
+            { q: "Need of the Self is", options: ["Temporary", "Quantitative", "Qualitative", "None of these"], correct: 2 },
+            { q: "The 'I' is", options: ["The doer", "The enjoyer", "The Seer", "All of these"], correct: 3 },
+            { q: "The responses of the Self are:", options: ["Knowing and Fulfilling", "Knowing, Assuming, Recognising, and Fulfilling", "Knowing and Recognising", "Knowing, Recognising and Fulfilling"], correct: 3 },
+            { q: "The needs of the Self are fulfilled by", options: ["Right Understanding and Right Feeling", "Right Feeling", "Right Understanding", "Cannot be decided"], correct: 0 },
+            { q: "Which is material unit?", options: ["Body", "Physical facility", "Physiochemical things", "All of these"], correct: 3 },
+            { q: "Which among the following is not an activity of the body", options: ["Assuming", "Recognizing", "Fulfilling", "All of these"], correct: 0 },
+            { q: "Self organization means", options: ["Innateness", "Co-existence", "Natural characteristics", "Form"], correct: 0 },
+            { q: "The Body is a .............unit; while the Self is a", options: ["Consciousness and Qualitative", "Material, Consciousness", "Consciousness, Material", "Quantitative, Material"], correct: 1 },
+            { q: "Which among the following is a variable unit?", options: ["Form", "Co-existence", "Innateness", "All of these"], correct: 3 },
+            { q: "............is done with the help of proper food, water and", options: ["Protection of the boday", "Right utilization of the body", "Nourishment of the body", "Exploitation of the body"], correct: 2 },
+            { q: "What is not the indicator of good health of the Self and Body", options: ["Feeling of self-regulation of the body", "Feeling of happiness and prosperity", "Feeling of jealousy, anger and competition for others", "None of these"], correct: 2 },
+            { q: "When we try to achieve happiness and prosperity by maximizing accumulation and consumption of physical facilities as our primary and only focus of life, we become", options: ["Anti-social", "Anti-ecological", "Threat to human survival", "All of these"], correct: 3 },
+            { q: "On having realization and understanding, we get", options: ["Assurance", "Satisfaction", "Universality", "All of these"], correct: 3 },
+            { q: "Physical facilities are required in .....................quantity", options: ["Uncertain", "Limited", "Unlimited", "Insignificant"], correct: 1 },
+            { q: "Doer means the one who", options: ["Understands", "Does something", "Experience", "All of these"], correct: 1 },
+            { q: "The basic unit of learning human interaction is", options: ["Society", "School", "Family", "Nature"], correct: 2 },
+            { q: "In Value Education 'Sanyam' means", options: ["Self exploration", "Self evaluation", "Self regulation", "None of these"], correct: 2 },
+            { q: "'Sanyam' is feeling of responsibility for ...............of the body", options: ["Nurturing and protection", "Protection and right utilization", "Nurturing and right utilization", "Nurturing, Protection and Right Utilization"], correct: 3 },
+            { q: "The pleasure obtained from sensations is", options: ["Temporary and source of long lasting happiness", "Continuous and source of long lasting happiness", "Short lived and continuous", "Short lived and temporary"], correct: 3 },
+            { q: "We should make choices with external world based on our", options: ["Natural acceptance", "Preconditioning", "Sensations", "All of these"], correct: 0 },
+            { q: "The Self reads the ................and gives the ................to the body", options: ["Instructions, Information", "Instructions, Sensation", "Sensation, Instruction", "Sensation, Information"], correct: 2 },
+            { q: "What leads to Resolution?", options: ["Assuming", "Knowing", "Recognising", "Fulfilling"], correct: 3 },
+            { q: "Which of the following is temporary in existence?", options: ["Space", "Consciousness", "Material unit", "Co-existence"], correct: 2 },
+            { q: "Which of the following is 'ever' in existence?", options: ["Space", "Consciousness", "Material unit", "None of these"], correct: 0 },
+            { q: "Which of the following is continuous in existence", options: ["Space", "Consciousness", "Material unit", "None of these"], correct: 1 },
+            { q: "Which among the following in not a characteristic of 'consciousness'?", options: ["Cyclic development", "Temporary", "Continuous", "Recognising"], correct: 1 },
+            { q: "........................wants to live with continuous happiness", options: ["Body", "Self", "Plant and animals", "Material unit"], correct: 1 },
+            { q: "....................is just used as an instrument of", options: ["Body, Self", "Self, Body", "Physical facility, Self", "Imagination, Preconditioning"], correct: 0 },
+            { q: "Find the wrong statement from the", options: ["Self is seer/viewer", "Self is doer (decision maker)", "Self is enjoyer (the one who experiences)", "Self is an instrument of the body"], correct: 3 },
+            { q: "Find the wrong statement", options: ["'seer' means one that sees/understands", "All the 5 senses are just the instruments enable the Self to see something from outside", "All in the process of seeing, the Self is used as an instrument", "You can also see within, without using the sensations in the"], correct: 2 },
+            { q: "Which of the following is a wrong statement?", options: ["Self if the one who decides – what to do and what not to do.", "The body is used to express the decision of the Self, if required.", "Self may or may not use the body to execute its decisions", "What I think is the decision of my"], correct: 3 },
+            { q: "Which of the following is not a correct statement as far as the relationship of the Body and Self is concerned?", options: ["It is my Self that experiences happiness and unhappiness", "It is my body that enjoys the taste of food", "It is my Self that feels enthused and depressed", "It is my Self that feels angry and delighted"], correct: 1 },
+            { q: "Which among the following statement is correct about the physical facility?", options: ["Physical facilities are required to fulfill the responsibility of the Self toward body", "Physical facilities are required to keep the body in good health by nurturing, protection and right utilization of the body.", "The required physical facilities could be recognised along with the required quantity for the nurturing, protection and utilization of the body", "All of these"], correct: 3 },
+            { q: "What does right utilization of body mean?", options: ["Use the body as an instrument of communication (behaviour)", "Use the body as an instrument of labour/work, to obtain necessary physical facility for the body", "As an instrument for the continuity of human tradition", "All of these"], correct: 3 },
+            { q: "Right utilization ensured of", options: ["Physical facilities", "Body", "Self", "All of these"], correct: 1 }
+        ];
+
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answered = false;
+        let mode = 'pdf';
+        let selectedAnswer = null;
+        let startTime;
+        let timerInterval;
+        let userAnswers = []; // Track all user answers
+
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function prepareQuestions(modeType) {
+            let questions = [...originalQuestions];
+            
+            // Always shuffle options within each question
+            questions = questions.map(q => {
+                const optionsWithIndex = q.options.map((opt, idx) => ({ text: opt, originalIndex: idx }));
+                const shuffledOptions = shuffleArray(optionsWithIndex);
+                const newCorrectIndex = shuffledOptions.findIndex(opt => opt.originalIndex === q.correct);
+                
+                return {
+                    q: q.q,
+                    options: shuffledOptions.map(opt => opt.text),
+                    correct: newCorrectIndex
+                };
+            });
+            
+            // Only shuffle questions if random mode
+            if (modeType === 'random') {
+                questions = shuffleArray(questions);
+            }
+            
+            return questions;
+        }
+
+        function updateTimer() {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
+            const seconds = (elapsed % 60).toString().padStart(2, '0');
+            const timerEl = document.getElementById('timer');
+            if (timerEl) timerEl.textContent = `${minutes}:${seconds}`;
+        }
+
+        function startQuiz(selectedMode) {
+            mode = selectedMode;
+            currentQuestions = prepareQuestions(mode);
+            currentQuestionIndex = 0;
+            score = 0;
+            selectedAnswer = null;
+            userAnswers = []; // Reset answers
+            startTime = Date.now();
+            
+            document.getElementById('landingPage').style.display = 'none';
+            document.getElementById('quizContainer').style.display = 'block';
+            document.getElementById('resultsContainer').style.display = 'none';
+            
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 1000);
+            
+            displayQuestion();
+        }
+
+        function displayQuestion() {
+            answered = false;
+            const question = currentQuestions[currentQuestionIndex];
+            const previousAnswer = userAnswers[currentQuestionIndex]; // Get previous answer if exists
+            
+            document.getElementById('questionCounter').textContent = 
+                `Q${currentQuestionIndex + 1}/${currentQuestions.length}`;
+            document.getElementById('scoreDisplay').textContent = 
+                `Score: ${score}/${currentQuestionIndex}`;
+            document.getElementById('progressFill').style.width = 
+                `${((currentQuestionIndex) / currentQuestions.length) * 100}%`;
+            
+            document.getElementById('questionText').textContent = question.q;
+            
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            
+            const letters = ['A', 'B', 'C', 'D'];
+            question.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option';
+                btn.innerHTML = `
+                    <span class="option-letter">${letters[index]}</span>
+                    <span class="option-text">${option}</span>
+                `;
+                btn.onclick = () => selectOption(index, btn);
+                optionsContainer.appendChild(btn);
+            });
+            
+            const feedback = document.getElementById('feedback');
+            feedback.style.display = 'none';
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const prevBtn = document.getElementById('prevBtn');
+            
+            // Handle previous button visibility
+            if (prevBtn) {
+                prevBtn.disabled = currentQuestionIndex === 0;
+            }
+            
+            // If user already answered this question, show their answer and result
+            if (previousAnswer !== undefined && previousAnswer !== null) {
+                answered = true;
+                selectedAnswer = previousAnswer.selected;
+                const isCorrect = previousAnswer.correct;
+                
+                const options = optionsContainer.querySelectorAll('.option');
+                
+                options.forEach((opt, idx) => {
+                    opt.classList.add('disabled');
+                    
+                    if (idx === question.correct) {
+                        opt.classList.add('correct');
+                    }
+                    
+                    // Highlight user's selected answer
+                    if (idx === selectedAnswer) {
+                        if (idx === question.correct) {
+                            opt.classList.add('correct');
+                        } else {
+                            opt.classList.add('wrong');
+                        }
+                    }
+                });
+                
+                // Show feedback
+                if (isCorrect) {
+                    feedback.textContent = '✅ Correct! Well done!';
+                    feedback.className = 'feedback correct';
+                } else {
+                    feedback.textContent = `❌ Incorrect. You chose: ${question.options[selectedAnswer]}. The correct answer is: ${question.options[question.correct]}`;
+                    feedback.className = 'feedback wrong';
+                }
+                feedback.style.display = 'block';
+                
+                submitBtn.textContent = 'Next →';
+                submitBtn.onclick = nextQuestion;
+                submitBtn.disabled = false;
+            } else {
+                // Fresh question - not answered yet
+                selectedAnswer = null;
+                submitBtn.textContent = 'Submit Answer';
+                submitBtn.disabled = true;
+                submitBtn.onclick = submitAnswer;
+            }
+        }
+
+        function selectOption(index, btnElement) {
+            if (answered) return;
+            selectedAnswer = index;
+            
+            // Remove selected styling from all options
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.style.borderColor = '#e5e7eb';
+                opt.style.background = 'white';
+            });
+            
+            // Highlight selected
+            btnElement.style.borderColor = '#4f46e5';
+            btnElement.style.background = '#f5f3ff';
+            
+            document.getElementById('submitBtn').disabled = false;
+        }
+
+        function submitAnswer() {
+            if (selectedAnswer === null || answered) return;
+            answered = true;
+            
+            const question = currentQuestions[currentQuestionIndex];
+            const options = document.querySelectorAll('.option');
+            const feedback = document.getElementById('feedback');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            const isCorrect = selectedAnswer === question.correct;
+            
+            // Save the answer
+            userAnswers[currentQuestionIndex] = {
+                selected: selectedAnswer,
+                correct: isCorrect
+            };
+            
+            // Update score if correct (only if not already counted)
+            if (isCorrect) {
+                score++;
+            }
+            
+            options.forEach((opt, idx) => {
+                opt.classList.add('disabled');
+                
+                if (idx === question.correct) {
+                    opt.classList.add('correct');
+                }
+                
+                // Highlight user's selected answer
+                if (idx === selectedAnswer) {
+                    if (idx === question.correct) {
+                        opt.classList.add('correct');
+                    } else {
+                        opt.classList.add('wrong');
+                    }
+                }
+            });
+            
+            if (isCorrect) {
+                feedback.textContent = '✅ Correct! Well done!';
+                feedback.className = 'feedback correct';
+            } else {
+                feedback.textContent = `❌ Incorrect. You chose: ${question.options[selectedAnswer]}. The correct answer is: ${question.options[question.correct]}`;
+                feedback.className = 'feedback wrong';
+            }
+            
+            feedback.style.display = 'block';
+            document.getElementById('scoreDisplay').textContent = 
+                `Score: ${score}/${currentQuestionIndex + 1}`;
+            
+            submitBtn.textContent = 'Next →';
+            submitBtn.onclick = nextQuestion;
+            submitBtn.disabled = false;
+        }
+
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                displayQuestion();
+            }
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            
+            if (currentQuestionIndex < currentQuestions.length) {
+                displayQuestion();
+            } else {
+                if (timerInterval) clearInterval(timerInterval);
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('quizContainer').style.display = 'none';
+            document.getElementById('resultsContainer').style.display = 'block';
+            
+            const percentage = Math.round((score / currentQuestions.length) * 100);
+            document.getElementById('finalScore').textContent = `${percentage}%`;
+            
+            let message = '';
+            if (percentage >= 90) {
+                message = '🌟 Outstanding! You mastered UHV Unit 2!';
+            } else if (percentage >= 70) {
+                message = '👏 Great job! You have a solid understanding of Self and Body.';
+            } else if (percentage >= 50) {
+                message = '👍 Good effort! Keep learning about Universal Human Values.';
+            } else {
+                message = '📚 Review the material and try again.';
+            }
+            
+            document.getElementById('resultsMessage').textContent = 
+                `${message} You answered ${score} out of ${currentQuestions.length} correctly.`;
+        }
+
+        function resetQuiz() {
+            if (timerInterval) clearInterval(timerInterval);
+            document.getElementById('landingPage').style.display = 'block';
+            document.getElementById('quizContainer').style.display = 'none';
+            document.getElementById('resultsContainer').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
