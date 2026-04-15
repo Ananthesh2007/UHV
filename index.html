@@ -701,7 +701,16 @@
             </div>
 
             <div class="question-card">
-            <div class="question-text" id="questionText"></div>   
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+    <div class="question-text" id="questionText"></div>
+    
+    <!-- Math Equation Button -->
+    <button onclick="openEquationEditor()" 
+            style="padding: 8px 12px; background: #4f46e5; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 6px;">
+        <span>📐</span>
+        <span>Insert Equation</span>
+    </button>
+</div>
                 
                 <div class="feedback" id="feedback"></div>
                 
@@ -6549,37 +6558,34 @@ function loadQuestionsForUnit(subjectId, unitId) {
     return [];
 }
 
- function displayQuestion() {
+function displayQuestion() {
     answered = false;
-    const q = currentQuestions[currentQuestionIndex];
-
-    document.getElementById('questionCounter').textContent = `Q${currentQuestionIndex+1}/${currentQuestions.length}`;
-    document.getElementById('scoreDisplay').textContent = `Score: ${score}/${currentQuestionIndex}`;
-
-    const qt = document.getElementById('questionText');
-    qt.innerHTML = q.q;                     // ← Use innerHTML (important for LaTeX)
-
-    // Render LaTeX with MathJax
-    if (window.MathJax) {
-        MathJax.typesetPromise([qt]).catch(() => {});
-    }
-
-    // Options
-    const container = document.getElementById('optionsContainer');
-    container.innerHTML = '';
-    const letters = ['A','B','C','D'];
-    q.options.forEach((opt, i) => {
+    const question = currentQuestions[currentQuestionIndex];
+    const previousAnswer = userAnswers[currentQuestionIndex];
+    
+    document.getElementById('questionCounter').textContent = 
+        `Q${currentQuestionIndex + 1}/${currentQuestions.length}`;
+    document.getElementById('scoreDisplay').textContent = 
+        `Score: ${score}/${currentQuestionIndex}`;
+    document.getElementById('progressFill').style.width = 
+        `${((currentQuestionIndex) / currentQuestions.length) * 100}%`;
+    
+    document.getElementById('questionText').textContent = question.q;
+    
+    const optionsContainer = document.getElementById('optionsContainer');
+    optionsContainer.innerHTML = '';
+    
+    const letters = ['A', 'B', 'C', 'D'];
+    question.options.forEach((option, index) => {
         const btn = document.createElement('button');
         btn.className = 'option';
-        btn.innerHTML = `<span class="option-letter">${letters[i]}</span><span class="option-text">${opt}</span>`;
-        btn.onclick = () => selectOption(i, btn);
-        container.appendChild(btn);
+        btn.innerHTML = `
+            <span class="option-letter">${letters[index]}</span>
+            <span class="option-text">${option}</span>
+        `;
+        btn.onclick = () => selectOption(index, btn);
+        optionsContainer.appendChild(btn);
     });
-
-    document.getElementById('submitBtn').textContent = 'Submit Answer';
-    document.getElementById('submitBtn').onclick = submitAnswer;
-    document.getElementById('submitBtn').disabled = true;
-}
     
     const feedback = document.getElementById('feedback');
     feedback.style.display = 'none';
@@ -6717,8 +6723,68 @@ function showResults() {
     document.getElementById('resultsMessage').textContent = 
         `${message} You answered ${score} out of ${currentQuestions.length} correctly.`;
 }
+        // ====================== MATH EQUATION EDITOR ======================
 
+function openEquationEditor() {
+    document.getElementById('equationModal').style.display = 'flex';
+    const input = document.getElementById('latexInput');
+    input.value = '';
+    input.focus();
+
+    // Live preview
+    input.oninput = function() {
+        const preview = document.getElementById('equationPreview');
+        preview.innerHTML = `\\(${this.value}\\ )`;
+        if (window.MathJax) {
+            MathJax.typesetClear([preview]);
+            MathJax.typesetPromise([preview]).catch(() => {});
+        }
+    };
+}
+
+function closeEquationEditor() {
+    document.getElementById('equationModal').style.display = 'none';
+}
+
+function insertEquation() {
+    const latex = document.getElementById('latexInput').value.trim();
+    if (!latex) {
+        alert("Please type a math equation!");
+        return;
+    }
+
+    const questionText = document.getElementById('questionText');
+    questionText.innerHTML += `<br><br>\\(${latex}\\ )`;
+
+    // Render the equation
+    if (window.MathJax) {
+        MathJax.typesetPromise().catch(() => {});
+    }
+
+    closeEquationEditor();
+}
     </script>
-    
+    <!-- Math Equation Editor Modal -->
+<div id="equationModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center;">
+    <div style="background: white; border-radius: 16px; width: 90%; max-width: 600px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+        <h3 style="margin-bottom: 16px;">Insert Math Equation (LaTeX)</h3>
+        
+        <textarea id="latexInput" rows="6" style="width: 100%; padding: 12px; font-family: monospace; font-size: 16px; border: 2px solid #e5e7eb; border-radius: 8px; resize: vertical;" placeholder="Type LaTeX here... e.g. E = mc^2"></textarea>
+        
+        <p style="margin: 12px 0 8px; font-size: 14px; color: #666;">Live Preview:</p>
+        <div id="equationPreview" style="padding: 16px; background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 8px; min-height: 60px; text-align: center;"></div>
+        
+        <div style="margin-top: 20px; display: flex; gap: 12px;">
+            <button onclick="insertEquation()" 
+                    style="flex: 1; padding: 14px; background: #4f46e5; color: white; border: none; border-radius: 10px; font-weight: 600;">
+                ✅ Insert Equation
+            </button>
+            <button onclick="closeEquationEditor()" 
+                    style="flex: 1; padding: 14px; background: #e5e7eb; color: #374151; border: none; border-radius: 10px; font-weight: 600;">
+                Cancel
+            </button>
+        </div>
+    </div>
+</div>
 </body>
 </html>
