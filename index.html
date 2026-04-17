@@ -935,7 +935,7 @@
         </div>
     </div
     <script>
-        // Subject and Unit Data
+// Subject and Unit Data
 const subjects = {
     1: { name: "Material Chemistry For Devices and E-Waste Management", units: ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"] },
     2: { name: "Linear Algebra and Transform Techniques", units: ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"] },
@@ -6840,7 +6840,8 @@ const questionDatabase = {
 ]
 }
 };
-        let currentSubject = null;
+
+let currentSubject = null;
 let currentUnit = null;
 let currentMode = null;
 let currentQuestions = [];
@@ -6851,24 +6852,40 @@ let timerInterval = null;
 let seconds = 0;
 
 function showPage(pageId) {
-    document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
+    });
     document.getElementById(pageId).classList.add('active');
+    window.scrollTo(0, 0);
 }
 
 function showUnits(subjectId) {
-    currentSubject = subjectId;
-    const subject = subjects[subjectId];
-    document.getElementById('unitsSubjectTitle').textContent = subject.name;
-    const unitsGrid = document.getElementById('unitsGrid');
-    unitsGrid.innerHTML = '';
-    subject.units.forEach((unitName, index) => {
-        const btn = document.createElement('button');
-        btn.className = 'unit-btn';
-        btn.textContent = unitName;
-        btn.onclick = () => selectUnit(index + 1);
-        unitsGrid.appendChild(btn);
-    });
-    showPage('unitsPage');
+    try {
+        currentSubject = subjectId;
+        const subject = subjects[subjectId];
+        
+        if (!subject) {
+            console.error('Subject not found:', subjectId);
+            return;
+        }
+        
+        document.getElementById('unitsSubjectTitle').textContent = subject.name;
+        
+        const unitsGrid = document.getElementById('unitsGrid');
+        unitsGrid.innerHTML = '';
+        
+        subject.units.forEach((unitName, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'unit-btn';
+            btn.textContent = unitName;
+            btn.onclick = () => selectUnit(index + 1);
+            unitsGrid.appendChild(btn);
+        });
+        
+        showPage('unitsPage');
+    } catch (e) {
+        console.error('Error in showUnits:', e);
+    }
 }
 
 function selectUnit(unitId) {
@@ -6877,33 +6894,52 @@ function selectUnit(unitId) {
 }
 
 function startQuiz(mode) {
-    currentMode = mode;
-    const questions = questionDatabase[currentSubject][currentUnit];
-    currentQuestions = mode === 'random' ? [...questions].sort(() => Math.random() - 0.5) : [...questions];
-    currentQuestionIndex = 0;
-    score = 0;
-    userAnswers = new Array(currentQuestions.length).fill(null);
-    seconds = 0;
-    showPage('quizPage');
-    startTimer();
-    showQuestion();
+    try {
+        currentMode = mode;
+        const questions = questionDatabase[currentSubject][currentUnit];
+        
+        if (!questions || questions.length === 0) {
+            alert('No questions available for this unit yet!');
+            return;
+        }
+        
+        if (mode === 'random') {
+            currentQuestions = [...questions].sort(() => Math.random() - 0.5);
+        } else {
+            currentQuestions = [...questions];
+        }
+        
+        currentQuestionIndex = 0;
+        score = 0;
+        userAnswers = new Array(currentQuestions.length).fill(null);
+        seconds = 0;
+        
+        showPage('quizPage');
+        startTimer();
+        showQuestion();
+    } catch (e) {
+        console.error('Error in startQuiz:', e);
+    }
 }
 
 function showQuestion() {
-    const q = currentQuestions[currentQuestionIndex];
+    const question = currentQuestions[currentQuestionIndex];
+    
     document.getElementById('questionCounter').textContent = `Q${currentQuestionIndex + 1}/${currentQuestions.length}`;
     document.getElementById('scoreDisplay').textContent = `Score: ${score}/${currentQuestionIndex}`;
     document.getElementById('progressFill').style.width = `${((currentQuestionIndex + 1) / currentQuestions.length) * 100}%`;
-    document.getElementById('questionText').innerHTML = q.q;
     
-    const opts = document.getElementById('optionsContainer');
-    opts.innerHTML = '';
-    q.options.forEach((opt, idx) => {
+    document.getElementById('questionText').innerHTML = question.q;
+    
+    const optionsContainer = document.getElementById('optionsContainer');
+    optionsContainer.innerHTML = '';
+    
+    question.options.forEach((option, index) => {
         const div = document.createElement('div');
         div.className = 'option';
-        div.innerHTML = `<span class="option-indicator">${String.fromCharCode(65 + idx)}</span><span>${opt}</span>`;
-        div.onclick = () => selectOption(idx);
-        opts.appendChild(div);
+        div.innerHTML = `<span class="option-indicator">${String.fromCharCode(65 + index)}</span><span>${option}</span>`;
+        div.onclick = () => selectOption(index);
+        optionsContainer.appendChild(div);
     });
     
     document.getElementById('feedback').className = 'feedback';
@@ -6912,27 +6948,38 @@ function showQuestion() {
     document.getElementById('prevBtn').disabled = currentQuestionIndex === 0;
 }
 
-function selectOption(idx) {
+function selectOption(index) {
     if (userAnswers[currentQuestionIndex] !== null) return;
-    document.querySelectorAll('.option').forEach((el, i) => el.classList.toggle('selected', i === idx));
-    userAnswers[currentQuestionIndex] = idx;
+    
+    document.querySelectorAll('.option').forEach((opt, i) => {
+        opt.classList.toggle('selected', i === index);
+    });
+    
+    userAnswers[currentQuestionIndex] = index;
     document.getElementById('submitBtn').disabled = false;
 }
 
 function submitAnswer() {
-    const q = currentQuestions[currentQuestionIndex];
+    const question = currentQuestions[currentQuestionIndex];
     const selected = userAnswers[currentQuestionIndex];
-    const correct = selected === q.correct;
-    const fb = document.getElementById('feedback');
-    fb.className = `feedback show ${correct ? 'correct' : 'wrong'}`;
-    fb.textContent = correct ? '✓ Correct!' : `✗ Wrong! Correct: ${q.options[q.correct]}`;
+    const correct = selected === question.correct;
+    
+    const feedback = document.getElementById('feedback');
+    feedback.className = `feedback show ${correct ? 'correct' : 'wrong'}`;
+    feedback.textContent = correct ? '✓ Correct!' : `✗ Wrong! Correct answer: ${question.options[question.correct]}`;
+    
     if (correct) score++;
     document.getElementById('scoreDisplay').textContent = `Score: ${score}/${currentQuestionIndex + 1}`;
-    document.querySelectorAll('.option').forEach((el, i) => {
-        el.classList.add('disabled');
-        if (i === q.correct) el.classList.add('correct');
-        else if (i === selected && !correct) el.classList.add('wrong');
+    
+    document.querySelectorAll('.option').forEach((opt, index) => {
+        opt.classList.add('disabled');
+        if (index === question.correct) {
+            opt.classList.add('correct');
+        } else if (index === selected && !correct) {
+            opt.classList.add('wrong');
+        }
     });
+    
     document.getElementById('submitBtn').disabled = true;
     document.getElementById('nextBtn').disabled = false;
 }
@@ -6948,17 +6995,27 @@ function nextQuestion() {
     if (currentQuestionIndex < currentQuestions.length - 1) {
         currentQuestionIndex++;
         showQuestion();
-    } else showResults();
+    } else {
+        showResults();
+    }
 }
 
 function showResults() {
     stopTimer();
-    const pct = Math.round((score / currentQuestions.length) * 100);
-    document.getElementById('finalScore').textContent = `${pct}%`;
-    let msg = pct >= 80 ? `Excellent! ${score}/${currentQuestions.length} 🎉` : 
-              pct >= 60 ? `Good! ${score}/${currentQuestions.length} 👍` : 
-              `${score}/${currentQuestions.length}. Keep studying! 📚`;
-    document.getElementById('resultsMessage').textContent = msg;
+    const percentage = Math.round((score / currentQuestions.length) * 100);
+    
+    document.getElementById('finalScore').textContent = `${percentage}%`;
+    
+    let message = '';
+    if (percentage >= 80) {
+        message = `Excellent work! You scored ${score} out of ${currentQuestions.length}. 🎉`;
+    } else if (percentage >= 60) {
+        message = `Good job! You scored ${score} out of ${currentQuestions.length}. Keep practicing! 👍`;
+    } else {
+        message = `You scored ${score} out of ${currentQuestions.length}. Review the material and try again! 📚`;
+    }
+    
+    document.getElementById('resultsMessage').textContent = message;
     showPage('resultsPage');
 }
 
@@ -6966,18 +7023,23 @@ function startTimer() {
     stopTimer();
     timerInterval = setInterval(() => {
         seconds++;
-        document.getElementById('timer').textContent = 
-            `${Math.floor(seconds/60).toString().padStart(2,'0')}:${(seconds%60).toString().padStart(2,'0')}`;
+        const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+        const secs = (seconds % 60).toString().padStart(2, '0');
+        document.getElementById('timer').textContent = `${mins}:${secs}`;
     }, 1000);
 }
 
 function stopTimer() {
-    if (timerInterval) clearInterval(timerInterval);
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
 }
 
 function backToSubjects() {
     stopTimer();
-    currentSubject = currentUnit = null;
+    currentSubject = null;
+    currentUnit = null;
     showPage('subjectsPage');
 }
 
@@ -6990,8 +7052,6 @@ function backToModeSelection() {
     stopTimer();
     showPage('modePage');
 }
-    </script>
+</script>
 </body>
 </html>
-
-        
